@@ -44,7 +44,8 @@ Makefile   // команды для запуска и тестирования
 Сервис предоставляет два метода:
 - `Subscribe` - подписка на события по ключу
 - `Publish` - публикация события по ключу
-У одного события может быть несколько слушателей
+
+У одного события может быть несколько слушателей.
 
 По умолчанию сервер запускается на порту `:50051`.
 
@@ -77,7 +78,7 @@ message Event {
 ```env
 HOST="0.0.0.0"          // хост сервера
 PORT="50051"            // порт сервера
-SHUTDOWN_TIMEOUT_S=5s   // таймаут для gracefu; shutdown
+SHUTDOWN_TIMEOUT_S=5s   // таймаут для graceful shutdown
 MAX_CONN_IDLE_S=300s    // время бездействия слушателя
 ```
 
@@ -89,13 +90,13 @@ MAX_CONN_IDLE_S=300s    // время бездействия слушателя
 ```
 make run
 ```
-Под капотом - go run cmd/server/main.go
+Под капотом - `go run cmd/server/main.go`
 
 - Запуск тестов: (из корня проекта)
 ```
 make test
 ```
-// под капотом - go test -v ./pkg/subpub/...
+Под капотом - `go test -v ./pkg/subpub/...`
 
 Далее рассмотрим пример работы сервиса.
 
@@ -109,10 +110,14 @@ make run
 ```
 
 2. Во втором терминале создадим подписку на событие `test`:
-`grpcurl -proto internal/proto/subpub.proto -plaintext -d '{"key": "test"}' localhost:50051 pubsub.PubSub/Subscribe`
+```
+grpcurl -proto internal/proto/subpub.proto -plaintext -d '{"key": "test"}' localhost:50051 pubsub.PubSub/Subscribe
+```
 
 3. В третьем терминале создадим событие `test`:
-`grpcurl -proto internal/proto/subpub.proto -plaintext -d '{"key": "test", "data": "test message"}' localhost:50051 pubsub.PubSub/Publish`
+```
+grpcurl -proto internal/proto/subpub.proto -plaintext -d '{"key": "test", "data": "test message"}' localhost:50051 pubsub.PubSub/Publish
+```
 
 В терминале слушателя увидим:
 ```
@@ -128,8 +133,8 @@ make run
 - Подписки в пакете `subpub` обрабатываются асинхронно: медленные подписчики не тормозят других
 - С помощью каналов сохраняется порядок сообщений (FIFO)
 - Логгирование в проекте реализованно с помощью логгера zap
-- для сервера реализован `graceful shutdown`
-- dependency injection и конструкторы: в main создаются экземпляры сервера, логгера и конфига и передаются вниз по цепочке
+- Для сервера реализован `graceful shutdown`
+- Dependency injection и конструкторы: в main создаются экземпляры сервера, логгера и конфига и передаются вниз по цепочке
 
 <a id="contacts"></a>
 ## Contacts 💬
