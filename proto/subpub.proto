@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package pubsub;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/YattaDeSune/event-bus/proto";
+
+service PubSub {
+    rpc Subscribe(SubscribeRequest) returns (stream Event);
+    rpc Publish(PublishRequest) returns (google.protobuf.Empty);
+}
+
+message SubscribeRequest {
+    string key = 1;
+}
+
+message PublishRequest {
+    string key = 1;
+    string data = 2;
+}
+
+message Event {
+    string data = 1;
+}
