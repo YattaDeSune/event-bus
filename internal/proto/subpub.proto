@@ -4,7 +4,7 @@ package pubsub;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/YattaDeSune/event-bus/proto";
+option go_package = "github.com/YattaDeSune/event-bus/internal/proto";
 
 service PubSub {
     rpc Subscribe(SubscribeRequest) returns (stream Event);

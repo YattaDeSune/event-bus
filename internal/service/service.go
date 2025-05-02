@@ -3,13 +3,12 @@ package service
 import (
 	"context"
 
+	"github.com/YattaDeSune/event-bus/internal/proto"
+	"github.com/YattaDeSune/event-bus/pkg/subpub"
 	"go.uber.org/zap"
-	"google.golang.org/protobuf/types/known/emptypb"
-
-	"github.com/YattaDeSune/event-bus/internal/subpub"
-	"github.com/YattaDeSune/event-bus/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type PubSubService struct {

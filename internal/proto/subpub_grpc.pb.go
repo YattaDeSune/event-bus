@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.21.12
-// source: proto/subpub.proto
+// source: internal/proto/subpub.proto
 
 package proto
 
@@ -160,5 +160,5 @@ var PubSub_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/subpub.proto",
+	Metadata: "internal/proto/subpub.proto",
 }

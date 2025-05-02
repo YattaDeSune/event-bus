@@ -2,15 +2,16 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/YattaDeSune/event-bus/internal/config"
+	"github.com/YattaDeSune/event-bus/internal/proto"
 	"github.com/YattaDeSune/event-bus/internal/service"
-	"github.com/YattaDeSune/event-bus/internal/subpub"
-	"github.com/YattaDeSune/event-bus/proto"
+	"github.com/YattaDeSune/event-bus/pkg/subpub"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -52,40 +53,42 @@ func (s *Server) Run() error {
 	}
 	s.log.Info("starting gRPC server", zap.String("addr", addr))
 
-	// в отдельной горутине, чтобы не блокироваться
 	go func() {
 		if err := s.grpcServer.Serve(lis); err != nil {
 			s.log.Fatal("failed to serve", zap.Error(err))
 		}
 	}()
 
-	// оставляем таймаут для graceful shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.GRPCServer.ShutdownTimeout)
-	defer cancel()
-
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	// при получении сиграла начинаем graceful shutdown
 	<-sigChan
 	s.log.Info("shutting down gRPC server...")
 
-	done := make(chan struct{})
+	// контекст с таймаутом для graceful shutdown
+	ctx, busCancel := context.WithTimeout(context.Background(), s.cfg.GRPCServer.ShutdownTimeout)
+	defer busCancel()
+
+	grpcDone := make(chan struct{})
 	go func() {
 		s.grpcServer.GracefulStop()
-		close(done)
+		close(grpcDone)
 	}()
 
 	select {
-	case <-done:
+	case <-grpcDone:
 		s.log.Info("gRPC server stopped gracefully")
 	case <-ctx.Done():
 		s.grpcServer.Stop()
-		s.log.Info("gRPC server stopped before timeout")
+		s.log.Warn("gRPC server stopped by timeout")
 	}
 
-	// Закрываем шину событий
+	// закрываем шину
 	if err := s.bus.Close(ctx); err != nil {
-		s.log.Error("failed to close event bus", zap.Error(err))
+		if errors.Is(err, context.DeadlineExceeded) {
+			s.log.Warn("event bus closed by timeout")
+		} else {
+			s.log.Error("failed to close event bus", zap.Error(err))
+		}
 	}
 
 	return nil
