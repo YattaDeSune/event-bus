@@ -49,10 +49,10 @@ func NewConfig(logger *zap.Logger) *Config {
 
 	logger.Info("loaded config",
 		zap.Error(err),
-		zap.String("Host", cfg.GRPCServer.Host),
-		zap.String("Port", cfg.GRPCServer.Port),
-		zap.Duration("ShutdownTimeout", cfg.GRPCServer.ShutdownTimeout),
-		zap.Duration("MaxConnectionIdle", cfg.GRPCServer.MaxConnectionIdle),
+		zap.String("Host", cfg.Host),
+		zap.String("Port", cfg.Port),
+		zap.Duration("ShutdownTimeout", cfg.ShutdownTimeout),
+		zap.Duration("MaxConnectionIdle", cfg.MaxConnectionIdle),
 	)
 
 	return &cfg

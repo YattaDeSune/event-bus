@@ -28,6 +28,7 @@ func NewLogger() Logger {
 		// запуск фейк-логгера
 		return zap.NewNop()
 	}
+	//nolint:errcheck
 	defer logger.Sync()
 
 	return logger

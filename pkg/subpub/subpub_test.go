@@ -2,6 +2,7 @@ package subpub
 
 import (
 	"context"
+	"log"
 	"runtime"
 	"sync"
 	"testing"
@@ -11,7 +12,11 @@ import (
 // тест на несколько слушателей
 func TestMultipleSubscribers(t *testing.T) {
 	bus := NewSubPub()
-	defer bus.Close(context.Background())
+	defer func() {
+		if err := bus.Close(context.Background()); err != nil {
+			log.Println("failed to close bus: %w", err)
+		}
+	}()
 
 	const subject = "test"
 	const subscribersCount = 10
@@ -50,7 +55,11 @@ func TestMultipleSubscribers(t *testing.T) {
 // тест на отписку
 func TestUnsubscribe(t *testing.T) {
 	bus := NewSubPub()
-	defer bus.Close(context.Background())
+	defer func() {
+		if err := bus.Close(context.Background()); err != nil {
+			log.Println("failed to close bus: %w", err)
+		}
+	}()
 
 	const subject = "test"
 	var received int
@@ -79,7 +88,11 @@ func TestUnsubscribe(t *testing.T) {
 // тест на сохранность порядка
 func TestMessageOrder(t *testing.T) {
 	bus := NewSubPub()
-	defer bus.Close(context.Background())
+	defer func() {
+		if err := bus.Close(context.Background()); err != nil {
+			log.Println("failed to close bus: %w", err)
+		}
+	}()
 
 	const subject = "test"
 	const messagesCount = 100

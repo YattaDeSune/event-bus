@@ -46,7 +46,7 @@ func NewServer(cfg *config.Config, logger *zap.Logger) *Server {
 }
 
 func (s *Server) Run() error {
-	addr := net.JoinHostPort(s.cfg.GRPCServer.Host, s.cfg.GRPCServer.Port)
+	addr := net.JoinHostPort(s.cfg.Host, s.cfg.Port)
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (s *Server) Run() error {
 	s.log.Info("shutting down gRPC server...")
 
 	// контекст с таймаутом для graceful shutdown
-	ctx, busCancel := context.WithTimeout(context.Background(), s.cfg.GRPCServer.ShutdownTimeout)
+	ctx, busCancel := context.WithTimeout(context.Background(), s.cfg.ShutdownTimeout)
 	defer busCancel()
 
 	grpcDone := make(chan struct{})
